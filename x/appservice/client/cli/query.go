@@ -1,0 +1,51 @@
+package cli
+
+import (
+  "fmt"
+
+  "github.com/cosmos/cosmos-sdk/client/context"
+  "github.com/cosmos/cosmos-sdk/codec"
+  "github.com/spf13/cobra"
+)
+
+func GetCmdResolveName(queryRoute string, cdc *codec.Codec) *cobra.Command {
+  return &cobra.Command{
+    Use: "resolve [name]",
+    Short: "resolve name",
+    Args: cobra.ExactArgs(1),
+    RunE: func(cmd *cobra.Command, args []string) error {
+      cliCtx := context.NewCLIContext().WithCodec(cdc)
+      name := args[0]
+
+      res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/resolve/%s", queryRoute, name), nil)
+      if err != nil {
+        fmt.Printf("Could not resolve name query - %s \n", string(name))
+        return nil
+      }
+
+      fmt.Println(string(res))
+      return nil
+    },
+  }
+}
+
+func GetCmdWhois(quertRoute string, cdc *codec.Codec) *cobra.Command {
+  return &cobra.Command{
+    Use: "whois [name]",
+    Short: "Query whois info of name",
+    Args: cobra.ExactArgs(1),
+    RunE: func(cmd *cobra.Command, args []string) error {
+      cliCtx := context.NewCLIContext().WithCodec(cdc)
+      name := args[0]
+
+      res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/whois/%s", quertRoute, name), nil)
+      if err != nil {
+        fmt.Printf("Cannot resolve whois query - %s \n", string(name))
+        return nil
+      }
+
+      fmt.Println(string(res))
+      return nil
+    }
+  }
+}
